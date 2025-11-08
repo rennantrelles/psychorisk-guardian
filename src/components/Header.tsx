@@ -29,11 +29,11 @@ export const Header = () => {
           </nav>
           
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              Entrar
+            <Button variant="ghost" size="sm" asChild>
+              <a href="/auth">Entrar</a>
             </Button>
-            <Button variant="hero" size="sm">
-              Começar
+            <Button variant="hero" size="sm" asChild>
+              <a href="/auth">Começar</a>
             </Button>
           </div>
         </div>

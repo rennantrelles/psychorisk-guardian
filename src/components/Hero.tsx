@@ -25,11 +25,11 @@ export const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg">
-                Começar Agora
+              <Button variant="hero" size="lg" asChild>
+                <a href="/auth">Começar Agora</a>
               </Button>
-              <Button variant="outline" size="lg">
-                Saiba Mais
+              <Button variant="outline" size="lg" asChild>
+                <a href="#metodologia">Saiba Mais</a>
               </Button>
             </div>
             

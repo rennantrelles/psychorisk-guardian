@@ -19,16 +19,20 @@ export const CTA = () => {
               variant="outline" 
               size="lg" 
               className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-medium hover:shadow-strong transition-all duration-300"
+              asChild
             >
-              Solicitar Demo
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <a href="/auth">
+                Solicitar Demo
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </a>
             </Button>
             <Button 
               variant="ghost" 
               size="lg"
               className="text-primary-foreground border border-primary-foreground/30 hover:bg-primary-foreground/10"
+              asChild
             >
-              Falar com Especialista
+              <a href="#contato">Falar com Especialista</a>
             </Button>
           </div>
         </div>
