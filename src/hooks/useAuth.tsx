@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, organization: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/dashboard`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     toast.success("Cadastro realizado com sucesso!");
-    navigate("/");
+    navigate("/dashboard");
     return { error: null };
   };
 
@@ -78,14 +78,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     toast.success("Login realizado com sucesso!");
-    navigate("/");
+    navigate("/dashboard");
     return { error: null };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     toast.success("Logout realizado com sucesso!");
-    navigate("/");
+    navigate("/auth");
   };
 
   return (
