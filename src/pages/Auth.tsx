@@ -15,6 +15,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupName, setSignupName] = useState("");
+  const [signupOrganization, setSignupOrganization] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -27,7 +28,7 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signUp(signupEmail, signupPassword, signupName);
+    await signUp(signupEmail, signupPassword, signupName, signupOrganization);
     setLoading(false);
   };
 
@@ -95,6 +96,17 @@ const Auth = () => {
                       placeholder="Seu nome completo"
                       value={signupName}
                       onChange={(e) => setSignupName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-organization">Organização</Label>
+                    <Input
+                      id="signup-organization"
+                      type="text"
+                      placeholder="Nome da sua organização"
+                      value={signupOrganization}
+                      onChange={(e) => setSignupOrganization(e.target.value)}
                       required
                     />
                   </div>

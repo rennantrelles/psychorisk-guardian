@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      organizacoes_autorizadas: {
+        Row: {
+          created_at: string
+          id: string
+          nome_organizacao: string
+          qtd_cadastros: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_organizacao: string
+          qtd_cadastros?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_organizacao?: string
+          qtd_cadastros?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_range: string | null
@@ -78,6 +99,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      validate_and_increment_org: {
+        Args: { org_name: string }
         Returns: boolean
       }
     }
