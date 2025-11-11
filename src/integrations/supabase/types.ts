@@ -68,6 +68,42 @@ export type Database = {
         }
         Relationships: []
       }
+      questoes_cadastradas: {
+        Row: {
+          cadastrado_por: string
+          cadastrado_por_nome: string
+          created_at: string | null
+          dimensao: string
+          id: string
+          organizacao: string
+          pergunta: string
+          sentido: string
+          updated_at: string | null
+        }
+        Insert: {
+          cadastrado_por: string
+          cadastrado_por_nome: string
+          created_at?: string | null
+          dimensao: string
+          id?: string
+          organizacao: string
+          pergunta: string
+          sentido: string
+          updated_at?: string | null
+        }
+        Update: {
+          cadastrado_por?: string
+          cadastrado_por_nome?: string
+          created_at?: string | null
+          dimensao?: string
+          id?: string
+          organizacao?: string
+          pergunta?: string
+          sentido?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

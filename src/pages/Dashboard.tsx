@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, LogOut, FileText, Users, Briefcase, Clock, AlertTriangle, MessageSquare, UserX, HelpCircle, Moon, PersonStanding } from "lucide-react";
+import { Shield, LogOut, FileText, Users, Briefcase, Clock, AlertTriangle, MessageSquare, UserX, HelpCircle, Moon, PersonStanding, Settings, PlusCircle } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +17,7 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Carregando...</div>
@@ -150,6 +152,52 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {isAdmin && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  Cadastrar Questões
+                </CardTitle>
+                <CardDescription>
+                  Cadastre as questões que serão aplicadas no questionário
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => navigate("/cadastrar-questoes")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-primary" />
+                  Definir Parâmetros das Dimensões
+                </CardTitle>
+                <CardDescription>
+                  Configure os parâmetros para análise das dimensões
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => alert("Em desenvolvimento")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;
@@ -163,7 +211,11 @@ const Dashboard = () => {
                   <CardDescription>{tool.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="hero" className="w-full">
+                  <Button 
+                    variant="hero" 
+                    className="w-full"
+                    onClick={() => navigate("/iniciar-questionario")}
+                  >
                     Iniciar Questionário
                   </Button>
                 </CardContent>
