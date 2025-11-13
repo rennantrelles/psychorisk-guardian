@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, LogOut, FileText, Users, Briefcase, Clock, AlertTriangle, MessageSquare, UserX, HelpCircle, Moon, PersonStanding, Settings, PlusCircle } from "lucide-react";
+import { Shield, LogOut, FileText, Users, Briefcase, Clock, AlertTriangle, MessageSquare, UserX, HelpCircle, Moon, PersonStanding } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 
-const Dashboard = () => {
+const ResultadosVisualizacao = () => {
   const { user, signOut, loading } = useAuth();
-  const { isAdmin, role, loading: roleLoading } = useUserRole();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,11 +18,11 @@ const Dashboard = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    // Redirecionar participantes para tela de boas-vindas
-    if (!roleLoading && !isAdmin && role === "participant") {
+    // Redirecionar não-admins
+    if (!roleLoading && !isAdmin) {
       navigate("/welcome");
     }
-  }, [isAdmin, role, roleLoading, navigate]);
+  }, [isAdmin, roleLoading, navigate]);
 
   if (loading || roleLoading) {
     return (
@@ -32,7 +32,7 @@ const Dashboard = () => {
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return null;
   }
 
@@ -136,7 +136,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
             <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
               <Shield className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -152,79 +152,12 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Olá {firstName}, bem vindo
+            Visualizar Resultados
           </h1>
           <p className="text-muted-foreground">
-            Selecione a ferramenta desejada para aplicação do questionário
+            Selecione a ferramenta para visualizar os resultados
           </p>
         </div>
-
-        {isAdmin && (
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Card className="border-primary/50 bg-primary/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  Cadastrar Questões
-                </CardTitle>
-                <CardDescription>
-                  Cadastre as questões que serão aplicadas no questionário
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  variant="hero" 
-                  className="w-full"
-                  onClick={() => navigate("/cadastrar-questoes")}
-                >
-                  Acessar
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-primary/50 bg-primary/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-primary" />
-                  Definir Parâmetros das Dimensões
-                </CardTitle>
-                <CardDescription>
-                  Configure os parâmetros para análise das dimensões
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  variant="hero" 
-                  className="w-full"
-                  onClick={() => alert("Em desenvolvimento")}
-                >
-                  Acessar
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-primary/50 bg-primary/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  Visualizar Resultados
-                </CardTitle>
-                <CardDescription>
-                  Visualize e analise os resultados dos questionários
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  variant="hero" 
-                  className="w-full"
-                  onClick={() => navigate("/resultados")}
-                >
-                  Acessar
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
@@ -242,9 +175,12 @@ const Dashboard = () => {
                   <Button 
                     variant="hero" 
                     className="w-full"
-                    onClick={() => navigate("/iniciar-questionario")}
+                    onClick={() => {
+                      // Funcionalidade a ser implementada
+                      console.log(`Visualizar resultados de ${tool.name}`);
+                    }}
                   >
-                    Iniciar Questionário
+                    Ver Resultados
                   </Button>
                 </CardContent>
               </Card>
@@ -256,4 +192,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default ResultadosVisualizacao;
