@@ -31,6 +31,8 @@ const CadastrarQuestoes = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [questoes, setQuestoes] = useState<Questao[]>([]);
+  const [questoesCadastradas, setQuestoesCadastradas] = useState<any[]>([]);
+  const [loadingQuestoes, setLoadingQuestoes] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [novaQuestao, setNovaQuestao] = useState<Questao>({
     pergunta: "",
@@ -43,6 +45,38 @@ const CadastrarQuestoes = () => {
       navigate("/auth");
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const carregarQuestoesCadastradas = async () => {
+      if (!user) return;
+      
+      setLoadingQuestoes(true);
+      try {
+        const profileData = await supabase
+          .from("profiles")
+          .select("organization")
+          .eq("id", user.id)
+          .single();
+
+        if (profileData.error) throw profileData.error;
+
+        const { data, error } = await supabase
+          .from("questoes_cadastradas")
+          .select("*")
+          .eq("organizacao", profileData.data.organization)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setQuestoesCadastradas(data || []);
+      } catch (error: any) {
+        toast.error("Erro ao carregar questões: " + error.message);
+      } finally {
+        setLoadingQuestoes(false);
+      }
+    };
+
+    carregarQuestoesCadastradas();
+  }, [user]);
 
   const handleAdicionarQuestao = () => {
     if (!novaQuestao.pergunta.trim()) {
@@ -92,15 +126,23 @@ const CadastrarQuestoes = () => {
 
       if (error) throw error;
 
-      toast.success("Questões cadastradas com sucesso!");
+      // Recarregar questões cadastradas
+      const { data } = await supabase
+        .from("questoes_cadastradas")
+        .select("*")
+        .eq("organizacao", profile.data.organization)
+        .order("created_at", { ascending: false });
+      
+      setQuestoesCadastradas(data || []);
       setQuestoes([]);
       setMostrarForm(false);
+      toast.success("Questões salvas com sucesso!");
     } catch (error: any) {
       toast.error("Erro ao salvar questões: " + error.message);
     }
   };
 
-  if (loading) {
+  if (loading || loadingQuestoes) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Carregando...</div>
@@ -129,67 +171,60 @@ const CadastrarQuestoes = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Cadastrar Questões
-          </h1>
-          <p className="text-muted-foreground">
-            Cadastre as questões que serão aplicadas no questionário
-          </p>
-        </div>
-
-        {questoes.length === 0 && !mostrarForm ? (
+      <main className="container mx-auto px-4 py-8 space-y-6">
+        {/* Questões já cadastradas */}
+        {questoesCadastradas.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Nenhuma questão cadastrada</CardTitle>
+              <CardTitle>Questões Cadastradas</CardTitle>
               <CardDescription>
-                Comece adicionando questões para o questionário
+                {questoesCadastradas.length} questão(ões) cadastrada(s) para sua organização
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => setMostrarForm(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Iniciar cadastro das questões
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            {questoes.map((questao, index) => (
-              <Card key={questao.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">Questão {index + 1}</CardTitle>
-                      <CardDescription className="mt-2">{questao.pergunta}</CardDescription>
-                      <div className="mt-4 flex gap-4 text-sm">
-                        <span className="text-muted-foreground">
-                          <strong>Sentido:</strong> {questao.sentido}
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {questoesCadastradas.map((questao, index) => (
+                  <div key={questao.id} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <p className="font-medium text-sm">Questão {index + 1}</p>
+                      <div className="flex gap-2 text-xs">
+                        <span className="px-2 py-1 bg-primary/10 text-primary rounded">
+                          {questao.sentido}
                         </span>
-                        <span className="text-muted-foreground">
-                          <strong>Dimensão:</strong> {questao.dimensao}
+                        <span className="px-2 py-1 bg-secondary/10 text-secondary-foreground rounded">
+                          {questao.dimensao}
                         </span>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoverQuestao(questao.id!)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <p className="text-sm text-muted-foreground">{questao.pergunta}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Cadastrada por {questao.cadastrado_por_nome} em{" "}
+                      {new Date(questao.created_at).toLocaleDateString("pt-BR")}
+                    </p>
                   </div>
-                </CardHeader>
-              </Card>
-            ))}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-            {mostrarForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nova Questão</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+        {/* Formulário de cadastro */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cadastrar Novas Questões</CardTitle>
+            <CardDescription>
+              Cadastre as questões que serão aplicadas no questionário da sua organização
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {!mostrarForm ? (
+              <Button onClick={() => setMostrarForm(true)} className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Iniciar Cadastro das Questões
+              </Button>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-4 border-t pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="pergunta">Pergunta a ser feita</Label>
                     <Input
@@ -204,7 +239,7 @@ const CadastrarQuestoes = () => {
                     <Label htmlFor="sentido">Sentido da questão</Label>
                     <Select
                       value={novaQuestao.sentido}
-                      onValueChange={(value: "Positivo" | "Negativo") =>
+                      onValueChange={(value: "Positivo" | "Negativo") => 
                         setNovaQuestao({ ...novaQuestao, sentido: value })
                       }
                     >
@@ -241,23 +276,47 @@ const CadastrarQuestoes = () => {
                     <Plus className="w-4 h-4 mr-2" />
                     Adicionar Questão
                   </Button>
-                </CardContent>
-              </Card>
-            )}
+                </div>
 
-            <div className="flex gap-4">
-              {!mostrarForm && (
-                <Button onClick={() => setMostrarForm(true)} variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar outra questão
-                </Button>
-              )}
-              <Button onClick={handleSalvarQuestoes} className="ml-auto">
-                Salvar alterações
-              </Button>
-            </div>
-          </div>
-        )}
+                {questoes.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="border-t pt-4">
+                      <h3 className="font-semibold mb-3">Questões a serem salvas ({questoes.length})</h3>
+                      <div className="space-y-2">
+                        {questoes.map((q) => (
+                          <div key={q.id} className="flex items-start gap-2 p-3 bg-secondary/10 rounded-lg">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{q.pergunta}</p>
+                              <div className="flex gap-2 mt-1">
+                                <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
+                                  {q.sentido}
+                                </span>
+                                <span className="text-xs px-2 py-0.5 bg-secondary/10 text-secondary-foreground rounded">
+                                  {q.dimensao}
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleRemoverQuestao(q.id!)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button onClick={handleSalvarQuestoes} className="w-full" size="lg">
+                      Salvar Todas as Questões
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

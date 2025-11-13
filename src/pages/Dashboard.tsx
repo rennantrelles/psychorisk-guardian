@@ -8,7 +8,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, role, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,6 +16,13 @@ const Dashboard = () => {
       navigate("/auth");
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    // Redirecionar participantes para tela de boas-vindas
+    if (!roleLoading && !isAdmin && role === "participant") {
+      navigate("/welcome");
+    }
+  }, [isAdmin, role, roleLoading, navigate]);
 
   if (loading || roleLoading) {
     return (

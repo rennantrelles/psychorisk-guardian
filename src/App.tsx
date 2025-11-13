@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Welcome from "./pages/Welcome";
 import CadastrarQuestoes from "./pages/CadastrarQuestoes";
 import IniciarQuestionario from "./pages/IniciarQuestionario";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/cadastrar-questoes" element={<CadastrarQuestoes />} />
             <Route path="/iniciar-questionario" element={<IniciarQuestionario />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
