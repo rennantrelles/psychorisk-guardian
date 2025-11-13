@@ -91,11 +91,17 @@ const IniciarQuestionario = () => {
     }
   };
 
-  const handleProximaQuestao = () => {
+  const handleProximaQuestao = async () => {
     if (!respostaAtual) {
       toast.error("Por favor, selecione uma resposta");
       return;
     }
+
+    const valorResposta = 
+      respostaAtual === "Nunca" ? 1 :
+      respostaAtual === "Raramente" ? 2 :
+      respostaAtual === "Às vezes" ? 3 :
+      respostaAtual === "Frequentemente" ? 4 : 5;
 
     const novaResposta: Resposta = {
       questaoId: questoes[questaoAtual].id,
@@ -103,6 +109,25 @@ const IniciarQuestionario = () => {
       resposta: respostaAtual,
       dimensao: questoes[questaoAtual].dimensao
     };
+
+    // Salvar resposta no banco
+    try {
+      const { error } = await supabase
+        .from("respostas_questionario")
+        .insert({
+          id_participante: user!.id,
+          id_questao: questoes[questaoAtual].id,
+          resposta_texto: respostaAtual,
+          valor: valorResposta,
+          sentido: questoes[questaoAtual].sentido,
+          dimensao: questoes[questaoAtual].dimensao
+        });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error("Erro ao salvar resposta: " + error.message);
+      return;
+    }
 
     setRespostas([...respostas, novaResposta]);
     setRespostaAtual("");
@@ -245,48 +270,71 @@ const IniciarQuestionario = () => {
         )}
 
         {etapa === "questoes" && questoes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Questão {questaoAtual + 1} de {questoes.length}
-              </CardTitle>
-              <CardDescription className="text-sm text-muted-foreground mt-2">
-                Dimensão: {questoes[questaoAtual].dimensao}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-lg">{questoes[questaoAtual].pergunta}</p>
+          <div className="space-y-6">
+            {/* Progress Bar */}
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((questaoAtual + 1) / questoes.length) * 100}%` }}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label>Resposta</Label>
-                <Select value={respostaAtual} onValueChange={setRespostaAtual}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione sua resposta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Nunca">Nunca</SelectItem>
-                    <SelectItem value="Raramente">Raramente</SelectItem>
-                    <SelectItem value="Às vezes">Às vezes</SelectItem>
-                    <SelectItem value="Frequentemente">Frequentemente</SelectItem>
-                    <SelectItem value="Sempre">Sempre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <Card className="max-w-3xl mx-auto">
+              <CardHeader>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-primary">
+                      {questaoAtual + 1}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-2xl mb-2">
+                      {questoes[questaoAtual].pergunta}
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      Questão {questaoAtual + 1} de {questoes.length}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  {["Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"].map((opcao) => (
+                    <Button
+                      key={opcao}
+                      variant={respostaAtual === opcao ? "default" : "outline"}
+                      className="w-full h-14 text-lg justify-start"
+                      onClick={() => setRespostaAtual(opcao)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          respostaAtual === opcao ? 'border-primary-foreground bg-primary-foreground' : 'border-muted-foreground'
+                        }`}>
+                          {respostaAtual === opcao && (
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                          )}
+                        </div>
+                        <span>{opcao}</span>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
 
-              <div className="flex gap-4">
-                {questaoAtual > 0 && (
-                  <Button variant="outline" onClick={handleVoltarQuestao}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
+                <div className="flex gap-4 pt-4">
+                  {questaoAtual > 0 && (
+                    <Button variant="outline" onClick={handleVoltarQuestao}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Voltar
+                    </Button>
+                  )}
+                  <Button onClick={handleProximaQuestao} className="ml-auto" disabled={!respostaAtual}>
+                    {questaoAtual < questoes.length - 1 ? "Próxima" : "Finalizar"}
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                )}
-                <Button onClick={handleProximaQuestao} className="ml-auto">
-                  {questaoAtual < questoes.length - 1 ? "Próxima" : "Finalizar"}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {etapa === "revisao" && (

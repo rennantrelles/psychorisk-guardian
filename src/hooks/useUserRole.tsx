@@ -5,12 +5,14 @@ import { useAuth } from "./useAuth";
 export const useUserRole = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!user) {
         setIsAdmin(false);
+        setRole(null);
         setLoading(false);
         return;
       }
@@ -19,13 +21,14 @@ export const useUserRole = () => {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .eq("role", "admin")
         .maybeSingle();
 
       if (!error && data) {
-        setIsAdmin(true);
+        setRole(data.role);
+        setIsAdmin(data.role === "admin");
       } else {
         setIsAdmin(false);
+        setRole(null);
       }
       setLoading(false);
     };
@@ -33,5 +36,5 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  return { isAdmin, loading };
+  return { isAdmin, role, loading };
 };
