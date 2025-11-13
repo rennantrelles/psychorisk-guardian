@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, ArrowRight, Info } from "lucide-react";
 import { toast } from "sonner";
-import welcomeBg from "@/assets/welcome-bg.jpg";
+import welcomeHero from "@/assets/welcome-hero.jpg";
 
 const Welcome = () => {
   const { user, signOut, loading } = useAuth();
@@ -48,9 +48,9 @@ const Welcome = () => {
 
       {/* Background Image */}
       <div 
-        className="absolute inset-0 z-0 opacity-30"
+        className="absolute inset-0 z-0 opacity-20"
         style={{
-          backgroundImage: `url(${welcomeBg})`,
+          backgroundImage: `url(${welcomeHero})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -61,13 +61,12 @@ const Welcome = () => {
       <main className="relative z-10 container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           {/* Welcome Message */}
-          <h1 className="text-5xl md:text-6xl font-bold text-primary animate-fade-in">
-            Bem-vindo ao HSE-IT Risk Assessment
+          <h1 className="text-5xl md:text-7xl font-bold text-primary animate-fade-in leading-tight">
+            Mostre-nos como você se sente
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Sua participação é fundamental para identificarmos e melhorarmos o ambiente de trabalho. 
-            Este questionário levará aproximadamente 15 minutos.
+            Sua voz importa. Responda ao questionário e ajude a construir um ambiente de trabalho melhor para todos.
           </p>
 
           {/* Action Buttons */}
@@ -77,7 +76,7 @@ const Welcome = () => {
               className="min-w-[200px] text-lg h-14"
               onClick={() => navigate("/iniciar-questionario")}
             >
-              Pronto para Responder
+              Iniciar Questionário
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             
@@ -86,7 +85,6 @@ const Welcome = () => {
               variant="outline" 
               className="min-w-[200px] text-lg h-14"
               onClick={() => {
-                // Você pode adicionar um modal ou página com mais informações
                 toast.info("Funcionalidade 'Saiba Mais' será implementada em breve");
               }}
             >

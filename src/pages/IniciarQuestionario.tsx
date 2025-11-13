@@ -112,7 +112,7 @@ const IniciarQuestionario = () => {
 
     // Salvar resposta no banco
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("respostas_questionario")
         .insert({
           id_participante: user!.id,
