@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, LogOut, ArrowLeft, ArrowRight } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -30,6 +29,7 @@ const IniciarQuestionario = () => {
   const [etapa, setEtapa] = useState<"demografico" | "questoes" | "revisao">("demografico");
   const [questaoAtual, setQuestaoAtual] = useState(0);
   const [questoes, setQuestoes] = useState<any[]>([]);
+  const [areas, setAreas] = useState<any[]>([]);
   const [loadingQuestoes, setLoadingQuestoes] = useState(false);
   
   const [dadosDemograficos, setDadosDemograficos] = useState<DadosDemograficos>({
@@ -49,34 +49,44 @@ const IniciarQuestionario = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    const carregarQuestoes = async () => {
+    const carregarDados = async () => {
       if (!user) return;
       
       setLoadingQuestoes(true);
       try {
-        const { data, error } = await supabase
+        // Carregar questões
+        const { data: questoesData, error: questoesError } = await supabase
           .from("questoes_cadastradas")
           .select("*")
           .order("created_at", { ascending: true });
 
-        if (error) throw error;
+        if (questoesError) throw questoesError;
         
-        if (!data || data.length === 0) {
+        if (!questoesData || questoesData.length === 0) {
           toast.error("Nenhuma questão cadastrada ainda");
           navigate("/dashboard");
           return;
         }
 
-        setQuestoes(data);
+        setQuestoes(questoesData);
+
+        // Carregar áreas
+        const { data: areasData, error: areasError } = await supabase
+          .from("areas_cadastradas")
+          .select("*")
+          .order("nome_area", { ascending: true });
+
+        if (areasError) throw areasError;
+        setAreas(areasData || []);
       } catch (error: any) {
-        toast.error("Erro ao carregar questões: " + error.message);
+        toast.error("Erro ao carregar dados: " + error.message);
       } finally {
         setLoadingQuestoes(false);
       }
     };
 
     if (etapa === "questoes" && questoes.length === 0) {
-      carregarQuestoes();
+      carregarDados();
     }
   }, [etapa, user, navigate, questoes.length]);
 
@@ -110,7 +120,7 @@ const IniciarQuestionario = () => {
       dimensao: questoes[questaoAtual].dimensao
     };
 
-    // Salvar resposta no banco
+    // Salvar resposta no banco com dados demográficos
     try {
       const { error } = await (supabase as any)
         .from("respostas_questionario")
@@ -120,7 +130,11 @@ const IniciarQuestionario = () => {
           resposta_texto: respostaAtual,
           valor: valorResposta,
           sentido: questoes[questaoAtual].sentido,
-          dimensao: questoes[questaoAtual].dimensao
+          dimensao: questoes[questaoAtual].dimensao,
+          sexo: dadosDemograficos.sexo,
+          faixa_etaria: dadosDemograficos.faixaEtaria,
+          setor: dadosDemograficos.setor,
+          tempo_empresa: dadosDemograficos.tempoCasa
         });
 
       if (error) throw error;
@@ -194,71 +208,114 @@ const IniciarQuestionario = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="sexo">Sexo</Label>
-                <Select
+              <div className="space-y-3">
+                <Label>Sexo</Label>
+                <RadioGroup 
                   value={dadosDemograficos.sexo}
                   onValueChange={(value) => setDadosDemograficos({ ...dadosDemograficos, sexo: value })}
+                  className="grid grid-cols-2 gap-3"
                 >
-                  <SelectTrigger id="sexo">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Masculino">Masculino</SelectItem>
-                    <SelectItem value="Feminino">Feminino</SelectItem>
-                    <SelectItem value="Outro">Outro</SelectItem>
-                    <SelectItem value="Prefiro não informar">Prefiro não informar</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Masculino" id="masculino" />
+                    <Label htmlFor="masculino" className="cursor-pointer flex-1">Masculino</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Feminino" id="feminino" />
+                    <Label htmlFor="feminino" className="cursor-pointer flex-1">Feminino</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Outro" id="outro" />
+                    <Label htmlFor="outro" className="cursor-pointer flex-1">Outro</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Prefiro não informar" id="nao-informar" />
+                    <Label htmlFor="nao-informar" className="cursor-pointer flex-1">Prefiro não informar</Label>
+                  </div>
+                </RadioGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="faixaEtaria">Faixa Etária</Label>
-                <Select
+              <div className="space-y-3">
+                <Label>Faixa Etária</Label>
+                <RadioGroup 
                   value={dadosDemograficos.faixaEtaria}
                   onValueChange={(value) => setDadosDemograficos({ ...dadosDemograficos, faixaEtaria: value })}
+                  className="grid grid-cols-2 gap-3"
                 >
-                  <SelectTrigger id="faixaEtaria">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="14-20">14-20 anos</SelectItem>
-                    <SelectItem value="20-30">20-30 anos</SelectItem>
-                    <SelectItem value="30-40">30-40 anos</SelectItem>
-                    <SelectItem value="40-50">40-50 anos</SelectItem>
-                    <SelectItem value="50-60">50-60 anos</SelectItem>
-                    <SelectItem value="60+">Mais de 60 anos</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="14-20" id="14-20" />
+                    <Label htmlFor="14-20" className="cursor-pointer flex-1">14-20 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="20-30" id="20-30" />
+                    <Label htmlFor="20-30" className="cursor-pointer flex-1">20-30 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="30-40" id="30-40" />
+                    <Label htmlFor="30-40" className="cursor-pointer flex-1">30-40 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="40-50" id="40-50" />
+                    <Label htmlFor="40-50" className="cursor-pointer flex-1">40-50 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="50-60" id="50-60" />
+                    <Label htmlFor="50-60" className="cursor-pointer flex-1">50-60 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="60+" id="60+" />
+                    <Label htmlFor="60+" className="cursor-pointer flex-1">Mais de 60 anos</Label>
+                  </div>
+                </RadioGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="setor">Setor</Label>
-                <Input
-                  id="setor"
-                  placeholder="Digite seu setor"
-                  value={dadosDemograficos.setor}
-                  onChange={(e) => setDadosDemograficos({ ...dadosDemograficos, setor: e.target.value })}
-                />
+              <div className="space-y-3">
+                <Label>Setor</Label>
+                {areas.length > 0 ? (
+                  <RadioGroup 
+                    value={dadosDemograficos.setor}
+                    onValueChange={(value) => setDadosDemograficos({ ...dadosDemograficos, setor: value })}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    {areas.map((area) => (
+                      <div key={area.id} className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                        <RadioGroupItem value={area.nome_area} id={area.id} />
+                        <Label htmlFor={area.id} className="cursor-pointer flex-1">{area.nome_area}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Nenhuma área cadastrada ainda</p>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tempoCasa">Tempo de Casa</Label>
-                <Select
+              <div className="space-y-3">
+                <Label>Tempo de Casa</Label>
+                <RadioGroup 
                   value={dadosDemograficos.tempoCasa}
                   onValueChange={(value) => setDadosDemograficos({ ...dadosDemograficos, tempoCasa: value })}
+                  className="grid grid-cols-2 gap-3"
                 >
-                  <SelectTrigger id="tempoCasa">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-1">0-1 ano</SelectItem>
-                    <SelectItem value="2-5">2-5 anos</SelectItem>
-                    <SelectItem value="5-10">5-10 anos</SelectItem>
-                    <SelectItem value="10-20">10-20 anos</SelectItem>
-                    <SelectItem value="20+">Mais de 20 anos</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Menos de 1 ano" id="menos-1" />
+                    <Label htmlFor="menos-1" className="cursor-pointer flex-1">Menos de 1 ano</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="1-3 anos" id="1-3" />
+                    <Label htmlFor="1-3" className="cursor-pointer flex-1">1-3 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="3-5 anos" id="3-5" />
+                    <Label htmlFor="3-5" className="cursor-pointer flex-1">3-5 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="5-10 anos" id="5-10" />
+                    <Label htmlFor="5-10" className="cursor-pointer flex-1">5-10 anos</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 rounded-lg border border-border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="Mais de 10 anos" id="mais-10" />
+                    <Label htmlFor="mais-10" className="cursor-pointer flex-1">Mais de 10 anos</Label>
+                  </div>
+                </RadioGroup>
               </div>
 
               <Button onClick={handleProximaEtapa} className="w-full">

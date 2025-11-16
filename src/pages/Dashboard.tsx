@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, LogOut, PlusCircle, Settings, FileText } from "lucide-react";
+import { Shield, LogOut, PlusCircle, Settings, FileText, MapPin } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const Dashboard = () => {
@@ -82,6 +82,27 @@ const Dashboard = () => {
                   variant="hero" 
                   className="w-full"
                   onClick={() => navigate("/cadastrar-questoes")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  Cadastrar Áreas
+                </CardTitle>
+                <CardDescription>
+                  Cadastre as áreas/setores da organização
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => navigate("/cadastrar-areas")}
                 >
                   Acessar
                 </Button>

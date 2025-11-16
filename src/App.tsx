@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Welcome from "./pages/Welcome";
 import CadastrarQuestoes from "./pages/CadastrarQuestoes";
+import CadastrarAreas from "./pages/CadastrarAreas";
 import IniciarQuestionario from "./pages/IniciarQuestionario";
 import ResultadosVisualizacao from "./pages/ResultadosVisualizacao";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/cadastrar-questoes" element={<CadastrarQuestoes />} />
+            <Route path="/cadastrar-areas" element={<CadastrarAreas />} />
             <Route path="/iniciar-questionario" element={<IniciarQuestionario />} />
             <Route path="/resultados" element={<ResultadosVisualizacao />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
