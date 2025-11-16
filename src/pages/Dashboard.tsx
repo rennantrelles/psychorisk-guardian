@@ -67,7 +67,68 @@ const Dashboard = () => {
 
         {isAdmin && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-...
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  Cadastrar Questões
+                </CardTitle>
+                <CardDescription>
+                  Cadastre as questões que serão aplicadas no questionário
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => navigate("/cadastrar-questoes")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-primary" />
+                  Definir Parâmetros das Dimensões
+                </CardTitle>
+                <CardDescription>
+                  Configure os parâmetros para análise das dimensões
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => alert("Em desenvolvimento")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  Visualizar Resultados
+                </CardTitle>
+                <CardDescription>
+                  Visualize e analise os resultados dos questionários
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="hero" 
+                  className="w-full"
+                  onClick={() => navigate("/resultados")}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
