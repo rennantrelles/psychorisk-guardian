@@ -104,6 +104,48 @@ export type Database = {
         }
         Relationships: []
       }
+      respostas_questionario: {
+        Row: {
+          created_at: string
+          dimensao: string
+          id: string
+          id_participante: string
+          id_questao: string
+          peso_invertido: number | null
+          probabilidade: number | null
+          resposta_texto: string
+          risco_coluna: string | null
+          sentido: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          dimensao: string
+          id?: string
+          id_participante: string
+          id_questao: string
+          peso_invertido?: number | null
+          probabilidade?: number | null
+          resposta_texto: string
+          risco_coluna?: string | null
+          sentido: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          dimensao?: string
+          id?: string
+          id_participante?: string
+          id_questao?: string
+          peso_invertido?: number | null
+          probabilidade?: number | null
+          resposta_texto?: string
+          risco_coluna?: string | null
+          sentido?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
