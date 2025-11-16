@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      areas_cadastradas: {
+        Row: {
+          cadastrado_por: string
+          cadastrado_por_nome: string
+          created_at: string
+          id: string
+          nome_area: string
+          organizacao: string
+          updated_at: string
+        }
+        Insert: {
+          cadastrado_por: string
+          cadastrado_por_nome: string
+          created_at?: string
+          id?: string
+          nome_area: string
+          organizacao: string
+          updated_at?: string
+        }
+        Update: {
+          cadastrado_por?: string
+          cadastrado_por_nome?: string
+          created_at?: string
+          id?: string
+          nome_area?: string
+          organizacao?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizacoes_autorizadas: {
         Row: {
           created_at: string
@@ -108,6 +138,7 @@ export type Database = {
         Row: {
           created_at: string
           dimensao: string
+          faixa_etaria: string | null
           id: string
           id_participante: string
           id_questao: string
@@ -116,11 +147,15 @@ export type Database = {
           resposta_texto: string
           risco_coluna: string | null
           sentido: string
+          setor: string | null
+          sexo: string | null
+          tempo_empresa: string | null
           valor: number
         }
         Insert: {
           created_at?: string
           dimensao: string
+          faixa_etaria?: string | null
           id?: string
           id_participante: string
           id_questao: string
@@ -129,11 +164,15 @@ export type Database = {
           resposta_texto: string
           risco_coluna?: string | null
           sentido: string
+          setor?: string | null
+          sexo?: string | null
+          tempo_empresa?: string | null
           valor: number
         }
         Update: {
           created_at?: string
           dimensao?: string
+          faixa_etaria?: string | null
           id?: string
           id_participante?: string
           id_questao?: string
@@ -142,6 +181,9 @@ export type Database = {
           resposta_texto?: string
           risco_coluna?: string | null
           sentido?: string
+          setor?: string | null
+          sexo?: string | null
+          tempo_empresa?: string | null
           valor?: number
         }
         Relationships: []
